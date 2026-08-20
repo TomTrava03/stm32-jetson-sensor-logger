@@ -1,2 +1,26 @@
 embedded-sensor-node-jetson-logger.md
 embedded-sensor-node-jetson-logger.html
+
+# STM32CubeIDE workspace
+.metadata/
+
+# Build directories
+Debug/
+Release/
+
+# Compiler and linker outputs
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.map
+*.list
+*.lst
+*.hex
+*.bin
+*.srec
+
+# Temporary files
+*.log
+*.bak

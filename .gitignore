@@ -24,3 +24,6 @@ Release/
 # Temporary files
 *.log
 *.bak
+
+# Local CubeIDE debug configurations
+*.launch

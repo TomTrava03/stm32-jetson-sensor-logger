@@ -18,11 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +35,8 @@
 /* USER CODE BEGIN PD */
 #define HEARTBEAT_INTERVAL_MS 500U
 #define BUTTON_DEBOUNCE_MS 50U
+#define TELEMETRY_INTERVAL_MS 1000U
+#define TELEMETRY_BUFFER_SIZE 96U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,6 +51,9 @@
 static uint32_t last_heartbeat_ms = 0U;
 static volatile uint32_t button_press_count = 0U;
 static uint32_t last_button_event_ms = 0U;
+static uint32_t last_telemetry_ms = 0U;
+static uint32_t telemetry_counter = 0U;
+static char telemetry_buffer[TELEMETRY_BUFFER_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,6 +96,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -104,15 +111,41 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
 	{
-	  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-	  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 	  const uint32_t now_ms = HAL_GetTick();
 
 	  if ((uint32_t)(now_ms - last_heartbeat_ms) >= HEARTBEAT_INTERVAL_MS)
 	  {
 		last_heartbeat_ms = now_ms;
 		BSP_LED_Toggle(LED2);
+	  }
+	  if ((uint32_t)(now_ms - last_telemetry_ms) >= TELEMETRY_INTERVAL_MS)
+	  {
+		  int message_length;
+
+		  last_telemetry_ms = now_ms;
+
+		  message_length = snprintf(
+				  telemetry_buffer,
+				  sizeof(telemetry_buffer),
+				  "counter=%lu button_presses=%lu uptime_ms=%lu\r\n",
+				  (unsigned long)telemetry_counter,
+				  (unsigned long)button_press_count,
+				  (unsigned long)now_ms);
+
+		  if ((message_length > 0) &&
+				  (message_length < (int)sizeof(telemetry_buffer)))
+		  {
+			  HAL_UART_Transmit(
+					  &huart2,
+					  (uint8_t *)telemetry_buffer,
+					  (uint16_t)message_length,
+					  100U);
+		  }
+
+		  telemetry_counter++;
 	  }
 	}
   /* USER CODE END 3 */

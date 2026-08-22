@@ -30,3 +30,6 @@ Release/
 
 # CubeIDE machine-local compiler discovery cache
 **/.settings/language.settings.xml
+
+# CubeIDE machine-local peripheral view
+**/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs

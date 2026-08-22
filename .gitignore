@@ -27,3 +27,6 @@ Release/
 
 # Local CubeIDE debug configurations
 *.launch
+
+# CubeIDE machine-local compiler discovery cache
+**/.settings/language.settings.xml

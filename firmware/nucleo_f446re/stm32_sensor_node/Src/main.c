@@ -32,7 +32,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define HEARTBEAT_INTERVAL_MS 500U
+#define BUTTON_DEBOUNCE_MS 50U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,7 +45,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+static uint32_t last_heartbeat_ms = 0U;
+static volatile uint32_t button_press_count = 0U;
+static uint32_t last_button_event_ms = 0U;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,12 +103,18 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
-  {
+	{
+	  /* USER CODE END WHILE */
 
-    /* USER CODE END WHILE */
+	  /* USER CODE BEGIN 3 */
+	  const uint32_t now_ms = HAL_GetTick();
 
-    /* USER CODE BEGIN 3 */
-  }
+	  if ((uint32_t)(now_ms - last_heartbeat_ms) >= HEARTBEAT_INTERVAL_MS)
+	  {
+		last_heartbeat_ms = now_ms;
+		BSP_LED_Toggle(LED2);
+	  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -163,7 +172,21 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	uint32_t now_ms;
 
+	if (GPIO_Pin != USER_BUTTON_PIN)
+		return;
+
+	now_ms = HAL_GetTick();
+
+	if ((uint32_t)(now_ms - last_button_event_ms) < BUTTON_DEBOUNCE_MS)
+		return;
+
+	last_button_event_ms = now_ms;
+	button_press_count++;
+}
 /* USER CODE END 4 */
 
 /**

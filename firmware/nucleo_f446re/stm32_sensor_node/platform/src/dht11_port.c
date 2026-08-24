@@ -58,3 +58,8 @@ void dht11_port_wait_us(uint16_t time_us)
 
 	while ((uint16_t)(dht11_port_read_counter() - start_us) < time_us) {}
 }
+
+uint32_t dht11_port_read_tick_ms(void)
+{
+	return HAL_GetTick();
+}

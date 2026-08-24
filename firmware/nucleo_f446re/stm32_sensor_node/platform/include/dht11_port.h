@@ -38,4 +38,9 @@ uint32_t dht11_port_read_counter(void);
  */
 void dht11_port_wait_us(uint16_t time_us);
 
+/*
+ * @brief: returns time (in milliseconds) to avoid too close requests
+ */
+uint32_t dht11_port_read_tick_ms(void);
+
 #endif /* DHT11_PORT_H */
